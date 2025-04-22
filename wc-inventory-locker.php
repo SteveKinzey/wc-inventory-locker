@@ -2,90 +2,77 @@
 /**
  * Plugin Name: WooCommerce Inventory Locker
  * Plugin URI: https://github.com/SteveKinzey/wc-inventory-locker
- * Description: Locks inventory when checkout is initiated to prevent overselling.
- * Version: 1.0
+ * Description: Locks WooCommerce inventory when a product is added to the cart, preventing overselling during high-demand periods.
+ * Version: 1.0.0
  * Author: Steve Kinzey
  * Author URI: https://sk-america.com
- * License: GPL2
- * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * License: MIT
+ * License URI: https://opensource.org/licenses/MIT
  * GitHub Plugin URI: https://github.com/SteveKinzey/wc-inventory-locker
  * Primary Branch: main
  */
 
 defined('ABSPATH') || exit;
 
-add_action('woocommerce_checkout_init', 'wc_lock_inventory_on_checkout');
+/**
+ * Lock stock when product is added to cart.
+ */
+add_action('woocommerce_add_to_cart', 'wc_inventory_locker_lock_stock', 10, 6);
 
-function wc_lock_inventory_on_checkout() {
-    if (!WC()->cart) return;
+function wc_inventory_locker_lock_stock($cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data) {
+    $product = wc_get_product($product_id);
+    if (!$product || !$product->managing_stock()) return;
 
-    foreach (WC()->cart->get_cart() as $cart_item) {
-        $product_id = $cart_item['product_id'];
-        $product = wc_get_product($product_id);
-        if (!$product || !$product->managing_stock()) continue;
+    $stock = $product->get_stock_quantity();
 
-        $qty = $cart_item['quantity'];
-        $stock = $product->get_stock_quantity();
+    if ($stock < $quantity) {
+        wc_add_notice(__('Not enough stock available for this product.'), 'error');
+        return;
+    }
 
-        if ($stock < $qty) {
-            wc_add_notice(__('Sorry, someone else is already checking out with this item.'), 'error');
-            wp_redirect(wc_get_cart_url());
-            exit;
-        }
+    $locked_key = "locked_stock_{$product_id}";
+    $existing_locked = WC()->session->get($locked_key, 0);
 
-        wc_update_product_stock($product, -$qty);
-        WC()->session->set("locked_stock_{$product_id}", $qty);
+    if ($existing_locked < $quantity) {
+        WC()->session->set($locked_key, $quantity);
+        do_action('wc_inventory_locker_product_locked', $product_id);
     }
 }
 
-add_action('woocommerce_checkout_order_processed', 'wc_clear_locked_stock');
+/**
+ * Restore locked stock if cart is emptied or product is removed.
+ */
+add_action('woocommerce_cart_item_removed', 'wc_inventory_locker_restore_stock', 10, 2);
+add_action('woocommerce_cart_emptied', 'wc_inventory_locker_restore_all_stock');
 
-function wc_clear_locked_stock($order_id) {
-    $session = WC()->session;
+function wc_inventory_locker_restore_stock($cart_item_key, $cart) {
+    $item = $cart->removed_cart_contents[$cart_item_key];
+    $product_id = $item['product_id'];
+    $locked_key = "locked_stock_{$product_id}";
+    WC()->session->__unset($locked_key);
+    do_action('wc_inventory_locker_stock_restored', $product_id);
+}
+
+function wc_inventory_locker_restore_all_stock() {
     foreach (WC()->cart->get_cart() as $cart_item) {
         $product_id = $cart_item['product_id'];
-        $session->set("locked_stock_{$product_id}", null);
+        $locked_key = "locked_stock_{$product_id}";
+        WC()->session->__unset($locked_key);
+        do_action('wc_inventory_locker_stock_restored', $product_id);
     }
 }
 
-add_action('woocommerce_checkout_destroyed', 'wc_restore_locked_stock');
-add_action('woocommerce_cart_emptied', 'wc_restore_locked_stock');
+/**
+ * Notice if GitHub Updater plugin is not installed.
+ */
+add_action('admin_notices', 'wc_inventory_github_updater_notice');
 
-function wc_restore_locked_stock() {
-    $session = WC()->session;
-    foreach (WC()->cart->get_cart() as $cart_item) {
-        $product_id = $cart_item['product_id'];
-        $product = wc_get_product($product_id);
-        if (!$product || !$product->managing_stock()) continue;
+function wc_inventory_github_updater_notice() {
+    if (!is_admin() || !current_user_can('manage_options')) return;
 
-        $locked_qty = $session->get("locked_stock_{$product_id}");
-        if ($locked_qty) {
-            wc_update_product_stock($product, $locked_qty);
-            $session->set("locked_stock_{$product_id}", null);
-        }
+    if (!class_exists('GitHub_Updater\Bootstrap') && !class_exists('github_updater')) {
+        echo '<div class="notice notice-warning is-dismissible">';
+        echo '<p><strong>WooCommerce Inventory Locker:</strong> To enable automatic updates, install the <a href="https://github.com/afragen/github-updater" target="_blank">GitHub Updater plugin</a>.</p>';
+        echo '</div>';
     }
-}
-
-add_shortcode('wc_lock_status', 'wc_inventory_locker_status_shortcode');
-
-function wc_inventory_locker_status_shortcode($atts) {
-    $atts = shortcode_atts([
-        'id' => 0,
-    ], $atts, 'wc_lock_status');
-
-    $product_id = intval($atts['id']);
-    if (!$product_id && is_product()) {
-        global $product;
-        $product_id = $product ? $product->get_id() : 0;
-    }
-
-    if (!$product_id) return '';
-
-    $locked_qty = WC()->session->get("locked_stock_{$product_id}");
-
-    if ($locked_qty && $locked_qty > 0) {
-        return '<div class="wc-lock-status locked">🛑 This item is currently locked in another customer’s cart.</div>';
-    }
-
-    return '<div class="wc-lock-status available">✅ This item is available for purchase.</div>';
 }
