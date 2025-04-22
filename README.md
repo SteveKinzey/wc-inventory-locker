@@ -68,10 +68,10 @@ To install via Composer:
 
 ## 📸 Screenshots
 
-### Product gets locked when added to cart
-![Screenshot 1](plugin-assets/wc-inventory-locker-banner-772x250.jpg)
+### Admin Interface
+![Admin UI](plugin-assets/wc-inventory-locker-banner-772x250.jpg)
 
-### Plugin icon
+### Plugin Icon
 ![Plugin Icon](plugin-assets/wc-inventory-locker-icon-256x256.jpg)
 
 ---

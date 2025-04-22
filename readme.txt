@@ -1,5 +1,5 @@
 === WooCommerce Inventory Locker ===
-Contributors: Stephen Kinzey
+Contributors: stevekinzey
 Donate link: https://sk-america.com
 Tags: woocommerce, inventory, cart, stock management, reserve stock, lock stock
 Requires at least: 5.8
