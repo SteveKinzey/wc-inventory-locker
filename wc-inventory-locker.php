@@ -3,20 +3,17 @@
  * Plugin Name: WooCommerce Inventory Locker
  * Plugin URI: https://github.com/SteveKinzey/wc-inventory-locker
  * Description: Locks WooCommerce inventory when a product is added to the cart, preventing overselling during high-demand periods.
- * Version: 1.0.0
+ * Version: 1.2
  * Author: Steve Kinzey
  * Author URI: https://sk-america.com
- * License: MIT
- * License URI: https://opensource.org/licenses/MIT
+ * License: GPLv2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * GitHub Plugin URI: https://github.com/SteveKinzey/wc-inventory-locker
  * Primary Branch: main
  */
 
 defined('ABSPATH') || exit;
 
-/**
- * Lock stock when product is added to cart.
- */
 add_action('woocommerce_add_to_cart', 'wc_inventory_locker_lock_stock', 10, 6);
 
 function wc_inventory_locker_lock_stock($cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data) {
@@ -24,7 +21,6 @@ function wc_inventory_locker_lock_stock($cart_item_key, $product_id, $quantity, 
     if (!$product || !$product->managing_stock()) return;
 
     $stock = $product->get_stock_quantity();
-
     if ($stock < $quantity) {
         wc_add_notice(__('Not enough stock available for this product.'), 'error');
         return;
@@ -39,9 +35,6 @@ function wc_inventory_locker_lock_stock($cart_item_key, $product_id, $quantity, 
     }
 }
 
-/**
- * Restore locked stock if cart is emptied or product is removed.
- */
 add_action('woocommerce_cart_item_removed', 'wc_inventory_locker_restore_stock', 10, 2);
 add_action('woocommerce_cart_emptied', 'wc_inventory_locker_restore_all_stock');
 
@@ -62,9 +55,6 @@ function wc_inventory_locker_restore_all_stock() {
     }
 }
 
-/**
- * Notice if GitHub Updater plugin is not installed.
- */
 add_action('admin_notices', 'wc_inventory_github_updater_notice');
 
 function wc_inventory_github_updater_notice() {

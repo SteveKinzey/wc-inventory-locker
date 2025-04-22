@@ -1,6 +1,6 @@
 # WooCommerce Inventory Locker
 
-![License](https://img.shields.io/github/license/SteveKinzey/wc-inventory-locker)
+![License](https://img.shields.io/badge/license-GPLv2-blue)
 ![WordPress Tested](https://img.shields.io/badge/WordPress-6.5%2B-blue)
 ![WooCommerce Compatible](https://img.shields.io/badge/WooCommerce-8.x-blue)
 ![PHP](https://img.shields.io/badge/PHP-7.4%2B-green)
@@ -13,9 +13,10 @@ Lock WooCommerce stock quantities as soon as a product is added to the cart, red
 ## 🔧 Features
 
 - Reserve stock when added to cart
-- Automatically restore stock if cart is abandoned or order is canceled
+- Automatically restore stock if cart is abandoned or item is removed
 - Works with both simple and variable products
-- Customizable timeout logic (planned feature)
+- Compatible with GitHub Updater
+- Built for high-conversion WooCommerce shops
 
 ---
 
@@ -32,51 +33,22 @@ Lock WooCommerce stock quantities as soon as a product is added to the cart, red
 
 When a product is added to the cart:
 
-- It checks stock quantity via native WooCommerce logic
-- It "reserves" the quantity in a transient or session
-- That product quantity is blocked from being sold to others
-- If the cart expires or order is canceled, the stock is restored
+- Stock is locked immediately using WooCommerce’s session system
+- Locked stock is restored if the product is removed or the cart is emptied
+- Prevents checkout if stock is insufficient
 
-### 🔌 Available Hooks
+---
+
+## 🔌 Hooks
 
 ```php
-do_action( 'wc_inventory_locker_product_locked', $product_id );
-do_action( 'wc_inventory_locker_stock_restored', $product_id );
+do_action('wc_inventory_locker_product_locked', $product_id);
+do_action('wc_inventory_locker_stock_restored', $product_id);
 ```
-
-Use these for custom logging or analytics integration.
-
----
-
-## 🧰 Composer Support (Optional)
-
-To install via Composer:
-
-```json
-"repositories": [
-  {
-    "type": "vcs",
-    "url": "https://github.com/SteveKinzey/wc-inventory-locker"
-  }
-],
-"require": {
-  "stevekinzey/wc-inventory-locker": "dev-main"
-}
-```
-
----
-
-## 📸 Screenshots
-
-### Admin Interface
-![Admin UI](plugin-assets/wc-inventory-locker-banner-772x250.jpg)
-
-### Plugin Icon
-![Plugin Icon](plugin-assets/wc-inventory-locker-icon-256x256.jpg)
 
 ---
 
 ## 📄 License
 
-This plugin is licensed under the MIT License.  
+This plugin is licensed under the GNU General Public License v2.0 or later.  
 See [LICENSE.txt](LICENSE.txt) for full license text.

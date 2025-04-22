@@ -5,9 +5,9 @@ Tags: woocommerce, inventory, cart, stock management, reserve stock, lock stock
 Requires at least: 5.8
 Tested up to: 6.5
 Requires PHP: 7.4
-Stable tag: trunk
-License: MIT
-License URI: https://opensource.org/licenses/MIT
+Stable tag: 1.2
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 Lock WooCommerce stock as soon as a product is added to the cart to prevent overselling. Ideal for limited inventory or high-demand launches.
 
@@ -15,45 +15,42 @@ Lock WooCommerce stock as soon as a product is added to the cart to prevent over
 
 **WooCommerce Inventory Locker** prevents overselling by reserving product stock the moment it's added to the cart. This plugin is ideal for high-traffic sales, limited edition drops, and scarcity-driven eCommerce.
 
-- Locks stock at cart-add stage
-- Frees up stock if cart is abandoned or order is cancelled
-- Compatible with simple and variable products
-- Does not conflict with native WooCommerce stock management
-
 == Installation ==
 
-1. Upload the plugin files to the `/wp-content/plugins/wc-inventory-locker` directory, or install the plugin through the WordPress plugins screen directly.
-2. Activate the plugin through the 'Plugins' screen in WordPress.
-3. That's it! Stock will now be locked when added to the cart.
+1. Upload the plugin files to `/wp-content/plugins/wc-inventory-locker`, or install through the WordPress admin.
+2. Activate through the 'Plugins' menu.
+3. Stock locking begins immediately for all cart additions.
 
 == Frequently Asked Questions ==
 
-= Does this plugin hold inventory forever? =
-No. Stock is held temporarily in session and released if the cart is abandoned or the order fails.
+= Will this reserve stock indefinitely? =
+No. Stock is held temporarily and released if the item is removed from the cart or the cart is emptied.
 
-= Will it work with product variations? =
-Yes, variable products are supported out of the box.
+= Does it support variable products? =
+Yes.
 
-= Is it compatible with other cart/session plugins? =
-Yes, it uses WooCommerce's built-in session and cart logic.
+= Can I configure the timeout or lock behavior? =
+Not in this version. Future versions may include customization.
 
 == Screenshots ==
 
-1. Product added to cart with stock locked
-2. Plugin icon in admin
+1. Product locked when added to cart
+2. Plugin icon display
 
 == Changelog ==
 
-= 1.0.0 =
-* Initial release
-* Simple and variable product support
-* Hook-based logic for lock and restore
-* Screenshot and icon assets included
+= 1.2 =
+* Changed license to GPLv2 for WordPress.org compliance
+* Improved locking and restoring logic
+* Updated hooks and documentation
+
+= 1.1 =
+* Initial stable release with GitHub Updater integration and stock locking
 
 == Upgrade Notice ==
 
-= 1.0.0 =
-Initial release for stable WooCommerce versions 7.x and 8.x
+= 1.2 =
+Updated licensing to GPLv2 and improved compatibility with WordPress plugin guidelines.
 
 == Credits ==
 
@@ -61,4 +58,4 @@ Plugin developed and maintained by [Steve Kinzey](https://github.com/SteveKinzey
 
 == License ==
 
-This plugin is released under the MIT License. See LICENSE.txt for details.
+This plugin is released under the GPLv2 License. See LICENSE.txt for details.
