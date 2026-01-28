@@ -3,7 +3,7 @@
  * Plugin Name: Inventory Locker
  * Plugin URI: https://github.com/SteveKinzey/inventory-locker
  * Description: Locks inventory when a product is added to the cart, preventing overselling during high-demand periods. Supports WooCommerce and SureCart.
- * Version: 2.2.0
+ * Version: 2.3.0
  * Author: Steve Kinzey
  * Author URI: https://sk-america.com
  * License: GPLv2 or later
@@ -15,7 +15,7 @@
 
 defined('ABSPATH') || exit;
 
-define('INVENTORY_LOCKER_VERSION', '2.2.0');
+define('INVENTORY_LOCKER_VERSION', '2.3.0');
 define('INVENTORY_LOCKER_DEFAULT_DURATION', 15);
 define('INVENTORY_LOCKER_FILE', __FILE__);
 
@@ -1055,20 +1055,77 @@ function inventory_locker_sc_register_rest_routes() {
     register_rest_route('inventory-locker/v1', '/validate-stock', [
         'methods' => 'POST',
         'callback' => 'inventory_locker_sc_validate_stock_rest',
-        'permission_callback' => '__return_true',
+        'permission_callback' => 'inventory_locker_rest_permission_check',
     ]);
     
     register_rest_route('inventory-locker/v1', '/lock-stock', [
         'methods' => 'POST',
         'callback' => 'inventory_locker_sc_lock_stock_rest',
-        'permission_callback' => '__return_true',
+        'permission_callback' => 'inventory_locker_rest_permission_check',
     ]);
     
     register_rest_route('inventory-locker/v1', '/release-stock', [
         'methods' => 'POST',
         'callback' => 'inventory_locker_sc_release_stock_rest',
-        'permission_callback' => '__return_true',
+        'permission_callback' => 'inventory_locker_rest_permission_check',
     ]);
+}
+
+/**
+ * Permission callback for REST endpoints.
+ * Validates nonce and applies rate limiting to prevent bot abuse.
+ */
+function inventory_locker_rest_permission_check($request) {
+    // Verify nonce from header (set by JavaScript)
+    $nonce = $request->get_header('X-WP-Nonce');
+    if (!$nonce || !wp_verify_nonce($nonce, 'wp_rest')) {
+        return new WP_Error(
+            'rest_forbidden',
+            __('Invalid or missing security token. Please refresh the page.', 'inventory-locker'),
+            ['status' => 403]
+        );
+    }
+    
+    // Rate limiting: max 30 requests per minute per IP
+    $ip = inventory_locker_get_client_ip();
+    $rate_key = 'il_rate_' . md5($ip);
+    $requests = get_transient($rate_key);
+    
+    if ($requests === false) {
+        set_transient($rate_key, 1, MINUTE_IN_SECONDS);
+    } elseif ($requests >= 30) {
+        return new WP_Error(
+            'rest_rate_limited',
+            __('Too many requests. Please wait a moment and try again.', 'inventory-locker'),
+            ['status' => 429]
+        );
+    } else {
+        set_transient($rate_key, $requests + 1, MINUTE_IN_SECONDS);
+    }
+    
+    return true;
+}
+
+/**
+ * Get client IP address, accounting for proxies.
+ */
+function inventory_locker_get_client_ip() {
+    $ip_keys = ['HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', 'REMOTE_ADDR'];
+    
+    foreach ($ip_keys as $key) {
+        if (!empty($_SERVER[$key])) {
+            $ip = $_SERVER[$key];
+            // Handle comma-separated IPs (X-Forwarded-For)
+            if (strpos($ip, ',') !== false) {
+                $ip = trim(explode(',', $ip)[0]);
+            }
+            if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                return $ip;
+            }
+        }
+    }
+    
+    return '0.0.0.0';
 }
 
 /**

@@ -5,7 +5,7 @@ Tags: woocommerce, surecart, inventory, cart, stock management, reserve stock, l
 Requires at least: 5.8
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2.2.0
+Stable tag: 2.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -91,6 +91,11 @@ Yes! Version 2.0+ supports both WooCommerce and SureCart with automatic platform
 
 == Changelog ==
 
+= 2.3.0 =
+* Security: Added nonce verification to REST API endpoints
+* Security: Added rate limiting (30 requests/minute per IP) to prevent bot abuse
+* Added proxy-aware IP detection (Cloudflare, nginx, etc.)
+
 = 2.2.0 =
 * Added Text Domain header for full translation/i18n support
 * Fixed license file format for proper GitHub detection (GPL-2.0)
@@ -135,6 +140,9 @@ Yes! Version 2.0+ supports both WooCommerce and SureCart with automatic platform
 * Initial stable release
 
 == Upgrade Notice ==
+
+= 2.3.0 =
+Security update: Adds bot protection and rate limiting to REST endpoints. Recommended for all users.
 
 = 2.2.0 =
 Improved WordPress.org compatibility and translation support. Recommended update for all users.
