@@ -167,7 +167,9 @@ function inventory_locker_settings_page() {
     
     if (isset($_POST['inventory_locker_save']) && wp_verify_nonce($_POST['inventory_locker_nonce'], 'inventory_locker_settings')) {
         $new_duration = isset($_POST['lock_duration']) ? intval($_POST['lock_duration']) : INVENTORY_LOCKER_DEFAULT_DURATION;
-        $password = isset($_POST['admin_password']) ? $_POST['admin_password'] : '';
+        // Password is intentionally not sanitized to preserve special characters
+        // It's only used for wp_check_password() and immediately discarded
+        $password = isset($_POST['admin_password']) ? wp_unslash($_POST['admin_password']) : '';
         
         if ($new_duration < 1 || $new_duration > 1440) {
             $error = __('Lock duration must be between 1 and 1440 minutes (24 hours).', 'inventory-locker');
