@@ -8,6 +8,7 @@
  * Author URI: https://sk-america.com
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain: inventory-locker
  * GitHub Plugin URI: https://github.com/SteveKinzey/inventory-locker
  * Primary Branch: main
  */
