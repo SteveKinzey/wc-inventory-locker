@@ -3,7 +3,7 @@
  * Plugin Name: WooCommerce Inventory Locker
  * Plugin URI: https://github.com/SteveKinzey/wc-inventory-locker
  * Description: Locks WooCommerce inventory when a product is added to the cart, preventing overselling during high-demand periods.
- * Version: 1.3
+ * Version: 1.4
  * Author: Steve Kinzey
  * Author URI: https://sk-america.com
  * License: GPLv2 or later
@@ -58,8 +58,16 @@ function wc_inventory_locker_get_product_locks($product_id) {
 function wc_inventory_locker_save_product_locks($product_id, $locks) {
     if (empty($locks)) {
         delete_transient("wc_inventory_locks_{$product_id}");
+        $tracked = get_option('wc_inventory_locker_tracked_products', []);
+        $tracked = array_diff($tracked, [$product_id]);
+        update_option('wc_inventory_locker_tracked_products', array_values($tracked), false);
     } else {
         set_transient("wc_inventory_locks_{$product_id}", $locks, WC_INVENTORY_LOCKER_LOCK_DURATION + MINUTE_IN_SECONDS);
+        $tracked = get_option('wc_inventory_locker_tracked_products', []);
+        if (!in_array($product_id, $tracked)) {
+            $tracked[] = $product_id;
+            update_option('wc_inventory_locker_tracked_products', $tracked, false);
+        }
     }
 }
 
@@ -333,6 +341,115 @@ function wc_inventory_locker_validate_cart_update($passed, $cart_item_key, $valu
     }
     
     return $passed;
+}
+
+/**
+ * Track all product IDs that have locks (for cleanup purposes).
+ */
+function wc_inventory_locker_track_locked_product($product_id) {
+    $tracked = get_option('wc_inventory_locker_tracked_products', []);
+    if (!in_array($product_id, $tracked)) {
+        $tracked[] = $product_id;
+        update_option('wc_inventory_locker_tracked_products', $tracked, false);
+    }
+}
+
+/**
+ * Clean up tracking for products with no locks.
+ */
+function wc_inventory_locker_untrack_product($product_id) {
+    $locks = wc_inventory_locker_get_product_locks($product_id);
+    if (empty($locks)) {
+        $tracked = get_option('wc_inventory_locker_tracked_products', []);
+        $tracked = array_diff($tracked, [$product_id]);
+        update_option('wc_inventory_locker_tracked_products', array_values($tracked), false);
+    }
+}
+
+/**
+ * Clean up locks for a specific session across all tracked products.
+ */
+function wc_inventory_locker_cleanup_session_locks($session_id) {
+    if (!$session_id) {
+        return;
+    }
+    
+    $tracked = get_option('wc_inventory_locker_tracked_products', []);
+    
+    foreach ($tracked as $product_id) {
+        $locks = wc_inventory_locker_get_product_locks($product_id);
+        if (isset($locks[$session_id])) {
+            unset($locks[$session_id]);
+            wc_inventory_locker_save_product_locks($product_id, $locks);
+            do_action('wc_inventory_locker_stock_restored', $product_id);
+        }
+        wc_inventory_locker_untrack_product($product_id);
+    }
+}
+
+/**
+ * Hook into WooCommerce session destruction to clean up locks.
+ */
+add_action('woocommerce_cleanup_sessions', 'wc_inventory_locker_cleanup_expired_sessions');
+
+function wc_inventory_locker_cleanup_expired_sessions() {
+    wc_inventory_locker_run_cleanup();
+}
+
+/**
+ * Schedule cleanup cron job on plugin activation.
+ */
+register_activation_hook(__FILE__, 'wc_inventory_locker_schedule_cleanup');
+
+function wc_inventory_locker_schedule_cleanup() {
+    if (!wp_next_scheduled('wc_inventory_locker_cleanup_cron')) {
+        wp_schedule_event(time(), 'hourly', 'wc_inventory_locker_cleanup_cron');
+    }
+}
+
+/**
+ * Clear scheduled cron on plugin deactivation.
+ */
+register_deactivation_hook(__FILE__, 'wc_inventory_locker_unschedule_cleanup');
+
+function wc_inventory_locker_unschedule_cleanup() {
+    wp_clear_scheduled_hook('wc_inventory_locker_cleanup_cron');
+}
+
+/**
+ * Cron job to clean up expired locks.
+ */
+add_action('wc_inventory_locker_cleanup_cron', 'wc_inventory_locker_run_cleanup');
+
+function wc_inventory_locker_run_cleanup() {
+    $tracked = get_option('wc_inventory_locker_tracked_products', []);
+    
+    foreach ($tracked as $product_id) {
+        $locks = wc_inventory_locker_get_product_locks($product_id);
+        wc_inventory_locker_untrack_product($product_id);
+    }
+}
+
+/**
+ * Clean up locks when user logs out.
+ */
+add_action('wp_logout', 'wc_inventory_locker_cleanup_on_logout');
+
+function wc_inventory_locker_cleanup_on_logout() {
+    $session_id = wc_inventory_locker_get_session_id();
+    wc_inventory_locker_cleanup_session_locks($session_id);
+}
+
+/**
+ * Clean up locks before WC session is destroyed.
+ */
+add_action('woocommerce_set_cart_cookies', 'wc_inventory_locker_maybe_cleanup_on_session_change', 10, 1);
+
+function wc_inventory_locker_maybe_cleanup_on_session_change($set) {
+    if (!$set) {
+        $session_id = wc_inventory_locker_get_session_id();
+        wc_inventory_locker_cleanup_session_locks($session_id);
+    }
 }
 
 add_action('admin_notices', 'wc_inventory_github_updater_notice');
