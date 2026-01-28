@@ -3,7 +3,7 @@ Contributors: stevekinzey
 Donate link: https://sk-america.com
 Tags: woocommerce, surecart, inventory, cart, stock management, reserve stock, lock stock, overselling
 Requires at least: 5.8
-Tested up to: 6.5
+Tested up to: 6.7
 Requires PHP: 7.4
 Stable tag: 2.2.0
 License: GPLv2 or later
