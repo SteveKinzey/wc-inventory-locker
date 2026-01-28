@@ -3,7 +3,7 @@
  * Plugin Name: WooCommerce Inventory Locker
  * Plugin URI: https://github.com/SteveKinzey/wc-inventory-locker
  * Description: Locks WooCommerce inventory when a product is added to the cart, preventing overselling during high-demand periods.
- * Version: 1.5
+ * Version: 1.6
  * Author: Steve Kinzey
  * Author URI: https://sk-america.com
  * License: GPLv2 or later
@@ -14,7 +14,7 @@
 
 defined('ABSPATH') || exit;
 
-define('WC_INVENTORY_LOCKER_VERSION', '1.5');
+define('WC_INVENTORY_LOCKER_VERSION', '1.6');
 define('WC_INVENTORY_LOCKER_DEFAULT_DURATION', 15);
 
 /**
@@ -503,17 +503,67 @@ function wc_inventory_locker_restore_all_stock() {
 
 /**
  * Release locks after successful order completion.
+ * Multiple hooks to ensure locks are released regardless of how checkout completes.
  */
 add_action('woocommerce_thankyou', 'wc_inventory_locker_release_on_order', 10, 1);
+add_action('woocommerce_payment_complete', 'wc_inventory_locker_release_on_payment_complete', 10, 1);
+add_action('woocommerce_order_status_processing', 'wc_inventory_locker_release_on_order_status', 10, 1);
+add_action('woocommerce_order_status_completed', 'wc_inventory_locker_release_on_order_status', 10, 1);
+add_action('woocommerce_order_status_on-hold', 'wc_inventory_locker_release_on_order_status', 10, 1);
+add_action('woocommerce_checkout_order_processed', 'wc_inventory_locker_release_on_checkout_processed', 10, 3);
 
 function wc_inventory_locker_release_on_order($order_id) {
     $session_id = wc_inventory_locker_get_session_id();
-    if (!$session_id) {
+    wc_inventory_locker_release_locks_for_order($order_id, $session_id);
+}
+
+function wc_inventory_locker_release_on_payment_complete($order_id) {
+    $order = wc_get_order($order_id);
+    if (!$order) {
+        return;
+    }
+    $session_id = $order->get_meta('_wc_inventory_locker_session_id');
+    wc_inventory_locker_release_locks_for_order($order_id, $session_id);
+}
+
+function wc_inventory_locker_release_on_order_status($order_id) {
+    $order = wc_get_order($order_id);
+    if (!$order) {
+        return;
+    }
+    $session_id = $order->get_meta('_wc_inventory_locker_session_id');
+    wc_inventory_locker_release_locks_for_order($order_id, $session_id);
+}
+
+function wc_inventory_locker_release_on_checkout_processed($order_id, $posted_data, $order) {
+    $session_id = wc_inventory_locker_get_session_id();
+    
+    if ($session_id && $order) {
+        $order->update_meta_data('_wc_inventory_locker_session_id', $session_id);
+        $order->save();
+    }
+    
+    wc_inventory_locker_release_locks_for_order($order_id, $session_id);
+}
+
+/**
+ * Core function to release locks for an order.
+ */
+function wc_inventory_locker_release_locks_for_order($order_id, $session_id = null) {
+    $order = wc_get_order($order_id);
+    if (!$order) {
         return;
     }
     
-    $order = wc_get_order($order_id);
-    if (!$order) {
+    if ($order->get_meta('_wc_inventory_locker_released')) {
+        return;
+    }
+    
+    if (!$session_id) {
+        $session_id = $order->get_meta('_wc_inventory_locker_session_id');
+    }
+    
+    if (!$session_id) {
         return;
     }
     
@@ -523,6 +573,9 @@ function wc_inventory_locker_release_on_order($order_id) {
         unset($locks[$session_id]);
         wc_inventory_locker_save_product_locks($check_product_id, $locks);
     }
+    
+    $order->update_meta_data('_wc_inventory_locker_released', true);
+    $order->save();
 }
 
 /**
