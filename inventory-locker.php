@@ -3,7 +3,7 @@
  * Plugin Name: Inventory Locker
  * Plugin URI: https://github.com/SteveKinzey/inventory-locker
  * Description: Locks inventory when a product is added to the cart, preventing overselling during high-demand periods. Supports WooCommerce and SureCart.
- * Version: 2.1
+ * Version: 2.2.0
  * Author: Steve Kinzey
  * Author URI: https://sk-america.com
  * License: GPLv2 or later
@@ -15,7 +15,7 @@
 
 defined('ABSPATH') || exit;
 
-define('INVENTORY_LOCKER_VERSION', '2.1');
+define('INVENTORY_LOCKER_VERSION', '2.2.0');
 define('INVENTORY_LOCKER_DEFAULT_DURATION', 15);
 define('INVENTORY_LOCKER_FILE', __FILE__);
 
