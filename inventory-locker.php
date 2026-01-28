@@ -1,14 +1,14 @@
 <?php
 /**
  * Plugin Name: Inventory Locker
- * Plugin URI: https://github.com/SteveKinzey/wc-inventory-locker
+ * Plugin URI: https://github.com/SteveKinzey/inventory-locker
  * Description: Locks inventory when a product is added to the cart, preventing overselling during high-demand periods. Supports WooCommerce and SureCart.
  * Version: 2.1
  * Author: Steve Kinzey
  * Author URI: https://sk-america.com
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * GitHub Plugin URI: https://github.com/SteveKinzey/wc-inventory-locker
+ * GitHub Plugin URI: https://github.com/SteveKinzey/inventory-locker
  * Primary Branch: main
  */
 
@@ -498,7 +498,7 @@ function wc_inventory_locker_validate_add_to_cart($passed, $product_id, $quantit
     if ($total_requested > $available) {
         wc_add_notice(
             sprintf(
-                __('Sorry, only %d units of "%s" are currently available. Other customers have items reserved in their carts.', 'wc-inventory-locker'),
+                __('Sorry, only %d units of "%s" are currently available. Other customers have items reserved in their carts.', 'inventory-locker'),
                 $available,
                 $product->get_name()
             ),
@@ -757,7 +757,7 @@ function wc_inventory_locker_validate_cart_update($passed, $cart_item_key, $valu
     if ($total_requested > $available) {
         wc_add_notice(
             sprintf(
-                __('Sorry, only %d units of "%s" are currently available. Other customers have items reserved in their carts.', 'wc-inventory-locker'),
+                __('Sorry, only %d units of "%s" are currently available. Other customers have items reserved in their carts.', 'inventory-locker'),
                 $available,
                 $product->get_name()
             ),
