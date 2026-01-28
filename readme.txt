@@ -91,6 +91,12 @@ Yes! Version 2.0+ supports both WooCommerce and SureCart with automatic platform
 
 == Changelog ==
 
+= 2.2.0 =
+* Added Text Domain header for full translation/i18n support
+* Fixed license file format for proper GitHub detection (GPL-2.0)
+* Renamed assets folder for WordPress.org compatibility
+* Cart quantity updates now properly adjust locked inventory amounts
+
 = 2.1 =
 * Renamed plugin to "Inventory Locker"
 * Updated all file and folder references
@@ -130,6 +136,9 @@ Yes! Version 2.0+ supports both WooCommerce and SureCart with automatic platform
 
 == Upgrade Notice ==
 
+= 2.2.0 =
+Improved WordPress.org compatibility and translation support. Recommended update for all users.
+
 = 2.1 =
 Plugin renamed to "Inventory Locker". All functionality preserved, backwards compatible.
 
@@ -142,4 +151,4 @@ Plugin developed and maintained by [Steve Kinzey](https://github.com/SteveKinzey
 
 == License ==
 
-This plugin is released under the GPLv2 License. See LICENSE.txt for details.
+This plugin is released under the GPLv2 License. See LICENSE for details.
