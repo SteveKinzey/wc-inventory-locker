@@ -20,6 +20,14 @@ define('INVENTORY_LOCKER_DEFAULT_DURATION', 15);
 define('INVENTORY_LOCKER_FILE', __FILE__);
 
 /**
+ * Load plugin textdomain for translations.
+ */
+add_action('init', 'inventory_locker_load_textdomain');
+function inventory_locker_load_textdomain() {
+    load_plugin_textdomain('inventory-locker', false, dirname(plugin_basename(__FILE__)) . '/languages');
+}
+
+/**
  * ============================================================================
  * PLATFORM DETECTION
  * ============================================================================

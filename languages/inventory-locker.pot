@@ -1,0 +1,219 @@
+# Inventory Locker - Translation Template
+# Copyright (C) 2026 Steve Kinzey
+# This file is distributed under the same license as the Inventory Locker package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Inventory Locker 2.3.0\n"
+"Report-Msgid-Bugs-To: https://github.com/SteveKinzey/inventory-locker/issues\n"
+"POT-Creation-Date: 2026-01-28 11:33-0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: inventory-locker.php:143 inventory-locker.php:215
+msgid "Inventory Locker Settings"
+msgstr ""
+
+#: inventory-locker.php:144
+msgid "Inventory Locker"
+msgstr ""
+
+#: inventory-locker.php:157
+msgid "Settings"
+msgstr ""
+
+#: inventory-locker.php:167
+msgid "You do not have sufficient permissions to access this page."
+msgstr ""
+
+#: inventory-locker.php:183
+msgid "Lock duration must be between 1 and 1440 minutes (24 hours)."
+msgstr ""
+
+#: inventory-locker.php:185
+msgid "Please enter your password to confirm changes."
+msgstr ""
+
+#: inventory-locker.php:195
+msgid "Incorrect password. Please try again."
+msgstr ""
+
+#: inventory-locker.php:201
+msgid "Settings saved successfully."
+msgstr ""
+
+#: inventory-locker.php:219
+msgid "No E-commerce Platform Detected:"
+msgstr ""
+
+#: inventory-locker.php:219
+msgid "Please install and activate WooCommerce or SureCart."
+msgstr ""
+
+#: inventory-locker.php:225
+msgid "Setup Required:"
+msgstr ""
+
+#: inventory-locker.php:225
+msgid "Please configure the lock duration to activate the plugin."
+msgstr ""
+
+#: inventory-locker.php:242
+msgid "Current Status"
+msgstr ""
+
+#: inventory-locker.php:245
+msgid "Active Platforms"
+msgstr ""
+
+#: inventory-locker.php:254
+msgid "None detected"
+msgstr ""
+
+#: inventory-locker.php:259
+msgid "Lock Duration"
+msgstr ""
+
+#: inventory-locker.php:260
+msgid "minutes"
+msgstr ""
+
+#: inventory-locker.php:263
+msgid "Active Locks"
+msgstr ""
+
+#: inventory-locker.php:264
+msgid "items currently reserved"
+msgstr ""
+
+#: inventory-locker.php:267
+msgid "Products with Locks"
+msgstr ""
+
+#: inventory-locker.php:271
+msgid "Plugin Status"
+msgstr ""
+
+#: inventory-locker.php:274
+msgid "Active"
+msgstr ""
+
+#: inventory-locker.php:276
+msgid "No Platform"
+msgstr ""
+
+#: inventory-locker.php:278
+msgid "Pending Configuration"
+msgstr ""
+
+#: inventory-locker.php:286 inventory-locker.php:316
+msgid "Update Settings"
+msgstr ""
+
+#: inventory-locker.php:286
+msgid "Initial Setup"
+msgstr ""
+
+#: inventory-locker.php:294
+msgid "Lock Duration (minutes)"
+msgstr ""
+
+#: inventory-locker.php:298
+msgid ""
+"How long inventory is reserved when added to cart. Recommended: 10-30 "
+"minutes."
+msgstr ""
+
+#: inventory-locker.php:305
+msgid "Confirm Password"
+msgstr ""
+
+#: inventory-locker.php:309
+msgid "Enter your WordPress password to confirm changes."
+msgstr ""
+
+#: inventory-locker.php:316
+msgid "Activate Plugin"
+msgstr ""
+
+#: inventory-locker.php:322
+msgid "How It Works"
+msgstr ""
+
+#: inventory-locker.php:324
+msgid ""
+"When a customer adds a product to their cart, the inventory is temporarily "
+"\"locked\" for them."
+msgstr ""
+
+#: inventory-locker.php:325
+msgid "Other customers cannot add more than the available (unlocked) stock."
+msgstr ""
+
+#: inventory-locker.php:326
+msgid ""
+"Locks automatically expire after the configured duration if the customer "
+"doesn't complete checkout."
+msgstr ""
+
+#: inventory-locker.php:327
+msgid ""
+"Locks are released immediately when items are removed from cart or checkout "
+"is completed."
+msgstr ""
+
+#: inventory-locker.php:329
+msgid "Supported Platforms"
+msgstr ""
+
+#: inventory-locker.php:331
+msgid "Full support for simple and variable products"
+msgstr ""
+
+#: inventory-locker.php:332
+msgid "Support for products with stock management enabled"
+msgstr ""
+
+#: inventory-locker.php:361
+msgid "Inventory Locker:"
+msgstr ""
+
+#: inventory-locker.php:362
+msgid "Please complete the initial setup to activate inventory locking."
+msgstr ""
+
+#: inventory-locker.php:363
+msgid "Configure Now"
+msgstr ""
+
+#: inventory-locker.php:512 inventory-locker.php:771
+#, php-format
+msgid ""
+"Sorry, only %d units of \"%s\" are currently available. Other customers have "
+"items reserved in their carts."
+msgstr ""
+
+#: inventory-locker.php:1094
+msgid "Invalid or missing security token. Please refresh the page."
+msgstr ""
+
+#: inventory-locker.php:1109
+msgid "Too many requests. Please wait a moment and try again."
+msgstr ""
+
+#: inventory-locker.php:1160
+#, php-format
+msgid ""
+"Sorry, only %d units are currently available. Other customers have items "
+"reserved."
+msgstr ""
+
+#: inventory-locker.php:1188
+#, php-format
+msgid "Sorry, only %d units are currently available."
+msgstr ""
